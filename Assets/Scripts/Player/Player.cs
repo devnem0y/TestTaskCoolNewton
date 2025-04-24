@@ -50,22 +50,21 @@ public class Player : MonoBehaviour, IPlayer, IController
         _jump = true;
     }
 
-    private void OnCollisionEnter2D(Collision2D col)
+    private void OnTakeDamage()
     {
-        if (!col.gameObject.CompareTag("Spike")) return;
-        
         Health--;
         TakeDamage?.Invoke();
+        _moveDirection = 0;
+        _rb.velocity = Vector2.zero;
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.CompareTag("Spike")) OnTakeDamage();
     }
     
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.CompareTag("DeadZone"))
-        {
-            Health--;
-            TakeDamage?.Invoke();
-        }
-        
         if (col.gameObject.CompareTag("Coin"))
         {
             Destroy(col.gameObject);
@@ -73,6 +72,7 @@ public class Player : MonoBehaviour, IPlayer, IController
             ChangeCoins?.Invoke();
         }
         
+        if (col.gameObject.CompareTag("DeadZone")) OnTakeDamage();
         if (col.gameObject.CompareTag("Finish")) Finish?.Invoke();
     }
 }
