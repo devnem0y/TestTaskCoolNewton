@@ -7,6 +7,7 @@ public class Game : MonoBehaviour
     public static Game Instance { get; private set; }
 
     private UIManager _uiManager;
+    [SerializeField] private Player _player;
 
     private void Awake()
     {
@@ -16,6 +17,7 @@ public class Game : MonoBehaviour
     private void Start()
     {
         _uiManager = new UIManager(FindObjectOfType<UIRoot>());
+        ChangeState(GameState.MAIN);
     }
 
     public void ChangeState(GameState state)
@@ -29,7 +31,7 @@ public class Game : MonoBehaviour
             case GameState.PLAY:
                 Debug.Log("<color=yellow>Play</color>");
                 //_uiManager.OpenViewHud();
-                //_uiManager.OpenViewController();
+                _uiManager.OpenViewController(_player);
                 break;
             case GameState.VICTORY:
                 Debug.Log("<color=yellow>Victory</color>");

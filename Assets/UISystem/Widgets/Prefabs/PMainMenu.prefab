@@ -478,6 +478,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 0
+  _btnPlay: {fileID: 2713268532198128070}
 --- !u!223 &1575486154561790075
 Canvas:
   m_ObjectHideFlags: 0
