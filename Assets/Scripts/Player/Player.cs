@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Player : MonoBehaviour, IPlayer, IController
 {
@@ -10,10 +11,18 @@ public class Player : MonoBehaviour, IPlayer, IController
     private bool _jump;
     
     private bool IsGrounded => _rb.IsTouchingLayers(LayerMask.GetMask("Ground"));
+    
+    public int Health { get; private set; }
+    public int Coins { get; private set; }
+    
+    public event Action TakeDamage;
+    public event Action ChangeCoins;
+    public event Action Finish;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
+        Health = 3;
     }
     
     private void FixedUpdate()
@@ -41,14 +50,29 @@ public class Player : MonoBehaviour, IPlayer, IController
         _jump = true;
     }
 
-    private void Update() //TODO: Для тестов, потом убрать
+    private void OnCollisionEnter2D(Collision2D col)
     {
-        if (Input.GetKeyDown(KeyCode.Space)) SetJump();
+        if (!col.gameObject.CompareTag("Spike")) return;
         
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) SetDirection(-1);
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) SetDirection(1);
-        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow)) SetDirection(0);
-        if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow)) SetDirection(0);
+        Health--;
+        TakeDamage?.Invoke();
     }
     
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.gameObject.CompareTag("DeadZone"))
+        {
+            Health--;
+            TakeDamage?.Invoke();
+        }
+        
+        if (col.gameObject.CompareTag("Coin"))
+        {
+            Destroy(col.gameObject);
+            Coins++;
+            ChangeCoins?.Invoke();
+        }
+        
+        if (col.gameObject.CompareTag("Finish")) Finish?.Invoke();
+    }
 }

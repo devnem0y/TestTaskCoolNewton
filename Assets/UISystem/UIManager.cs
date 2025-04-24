@@ -30,6 +30,12 @@
             {
                 _uiRoot.Create<IEmptyWidget>(nameof(WLoseWin), null);
             }
+
+            public void CloseViewGameplay()
+            {
+                _uiRoot.Kill(nameof(PController));
+                _uiRoot.Kill(nameof(PHud));
+            }
         }
     }
 }

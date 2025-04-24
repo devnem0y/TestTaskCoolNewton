@@ -5,14 +5,13 @@ using UralHedgehog.UI;
 public class Game : MonoBehaviour
 {
     public static Game Instance { get; private set; }
-
+    
+    [SerializeField] private Level _levelPrefab;
+    
+    public GameState State { get; private set; }
     private UIManager _uiManager;
-    [SerializeField] private Player _player;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+    private void Awake() { Instance = this; }
 
     private void Start()
     {
@@ -22,28 +21,27 @@ public class Game : MonoBehaviour
 
     public void ChangeState(GameState state)
     {
-        switch (state)
+        State = state;
+        switch (State)
         {
             case GameState.MAIN:
-                Debug.Log("<color=yellow>Main</color>");
                 _uiManager.OpenViewMainMenu();
                 break;
             case GameState.PLAY:
-                Debug.Log("<color=yellow>Play</color>");
-                //_uiManager.OpenViewHud();
-                _uiManager.OpenViewController(_player);
+                var level = Instantiate(_levelPrefab);
+                level.Run();
+                _uiManager.OpenViewController(level.Player);
+                _uiManager.OpenViewHud(level.Player);
                 break;
             case GameState.VICTORY:
-                Debug.Log("<color=yellow>Victory</color>");
-                _uiManager.OpenViewLoseWin();
-                break;
             case GameState.DEFEAT:
-                Debug.Log("<color=yellow>Defeat</color>");
+                _uiManager.CloseViewGameplay();
                 _uiManager.OpenViewLoseWin();
                 break;
-                
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        
+        Debug.Log($"<color=yellow>{state.ToString()}</color>");
     }
 }
